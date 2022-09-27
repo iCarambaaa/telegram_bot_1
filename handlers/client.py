@@ -1,12 +1,15 @@
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
-
+from keyboards import kb_client
+from aiogram.types import ReplyKeyboardRemove
 
 # @dp.message_handler(commands=["start", "help"])
+
+
 async def command_start(message: types.Message):
     # as telegram bots aren't allowed to start conversation and the send_message handler is used we need to a try and catch here
     try:
-        await bot.send_message(message.from_user.id, "good appetite")
+        await bot.send_message(message.from_user.id, "good appetite", reply_markup=kb_client)
         await message.delete()  # delete user command in chat
     except:
         message.reply(
@@ -26,7 +29,7 @@ async def command_time(message: types.Message):
 # @dp.message_handler(commands=["location"])
 async def command_location(message: types.Message):
     try:
-        await bot.send_message(message.from_user.id, "Prinz Street 132, New London")
+        await bot.send_message(message.from_user.id, "Prinz Street 132, New London", reply_markup=ReplyKeyboardRemove())
         # await message.delete()
     except:
         message.reply(
