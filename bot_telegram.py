@@ -9,6 +9,7 @@ async def on_startup(_):
 
 
 client.register_handlers_client(dp)
+admin.register_handlers_admin(dp)
 # as this one is empty (no commands) import always last
 other.register_handlers_other(dp)
 

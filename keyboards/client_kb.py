@@ -13,5 +13,4 @@ kb_client = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
 # insert for same line
 # row for all in one row
 # mix and combine as you like
-kb_client.add(b1).add(b2).insert(b3)
-#kb_client.row(b4, b5)
+kb_client.add(b1).add(b2).insert(b3)  # .row(b4, b5)
