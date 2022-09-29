@@ -3,6 +3,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
+from database import sqlite_db
+from keyboards import admin_kb
 
 ID = None
 
@@ -18,8 +20,7 @@ class FSMAdmin(StatesGroup):
 async def make_changes_command(message: types.Message):
     global ID
     ID = message.from_user.id
-    # , reply_markup=button_case_admin)
-    await bot.send_message(message.from_user.id, "happy to serve human master, what can I do for you?")
+    await bot.send_message(message.from_user.id, "happy to serve human master, what can I do for you?", reply_markup=admin_kb.button_case_admin)
     await message.delete()
 
 
@@ -85,19 +86,18 @@ async def load_price(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["price"] = float(message.text)
 
-        async with state.proxy() as data:
-            await message.reply(str(data))
-        # sql_add(state)
+        await sqlite_db.sql_add_command(state)
         await state.finish()
+        await message.reply("thank you")
 
 
 # register the handlers
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(cm_start, commands=["new"], state=None)
-    dp.register_message_handler(cancel_handler, Text(
-        equals="cancel", ignore_case=True), state="*")
     dp.register_message_handler(make_changes_command, commands=[
                                 "admin"], is_chat_admin=True)
+    dp.register_message_handler(cm_start, commands=["new_item"], state=None)
+    dp.register_message_handler(cancel_handler, Text(
+        equals="cancel", ignore_case=True), state="*")
     dp.register_message_handler(load_photo, content_types=[
                                 "photo"], state=FSMAdmin.photo)
     dp.register_message_handler(load_name, state=FSMAdmin.name)

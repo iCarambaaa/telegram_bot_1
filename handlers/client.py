@@ -2,6 +2,7 @@ from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from keyboards import kb_client
 from aiogram.types import ReplyKeyboardRemove
+from database import sqlite_db
 
 # @dp.message_handler(commands=["start", "help"])
 
@@ -36,7 +37,13 @@ async def command_location(message: types.Message):
             'No dm before user started private conversation first:\nhttps://t.me/@testing_pizza089_bot')
 
 
+# @dp.message_handler(commands=["menu"])
+async def command_menu(message: types.Message):
+    await sqlite_db.sql_read(message)
+
+
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=["start", "help"])
     dp.register_message_handler(command_time, commands=["time"])
     dp.register_message_handler(command_location, commands=["location"])
+    dp.register_message_handler(command_menu, commands=["menu"])
