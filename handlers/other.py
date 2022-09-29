@@ -16,5 +16,11 @@ async def echo_send(message: types.Message):
     # await bot.send_message(message.from_user.id, message.text) # answer same text but to user as a dm
 
 
+# use lambda to filter text
+@dp.message_handler(lambda message: "ufo" in message.text)
+async def ufo(message: types.Message):
+    await message.answer("hello other world")
+
+
 def register_handlers_other(dp: Dispatcher):
     dp.register_message_handler(echo_send)
