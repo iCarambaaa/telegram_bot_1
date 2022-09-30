@@ -1,3 +1,4 @@
+from ast import In
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
@@ -5,6 +6,7 @@ from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from database import sqlite_db
 from keyboards import admin_kb
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 ID = None
 
@@ -27,7 +29,6 @@ async def make_changes_command(message: types.Message):
 # handler for starting dialog to save new menu items
 # @dp.message_handler(commands='upload', state=None)
 
-
 async def cm_start(message: types.Message):
     if message.from_user.id == ID:
         await FSMAdmin.photo.set()
@@ -46,7 +47,6 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 # handler for first answer
 # @dp.message_handler(content_types=["photo"], state=FSMAdmin.photo)
-
 
 async def load_photo(message: types.Message, state=FSMContext):
     if message.from_user.id == ID:
@@ -89,6 +89,23 @@ async def load_price(message: types.Message, state: FSMContext):
         await sqlite_db.sql_add_command(state)
         await state.finish()
         await message.reply("thank you")
+
+# implement delete button
+
+
+@dp.callback_query_handler(lambda x: x.data and x.data.startswith("del "))
+async def del_callback_run(callback_query: types.CallbackQuery):
+    await sqlite_db.sql_delete_command(callback_query.data.replace("del ", ""))
+    await callback_query.answer(text=f'{callback_query.data.replace("del ", "")} deleted!', show_alert=True)
+
+
+@dp.message_handler(commands="delete")
+async def delete_item(message: types.Message):
+    if message.from_user.id == ID:
+        read = await sqlite_db.sql_read2()
+        for ret in read:
+            await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\ndescription: {ret[2]}\nprice: {ret[-1]}')
+            await bot.send_message(message.from_user.id, text='^^^', reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(f'delete {ret[1]}', callback_data=f'del {ret[1]}')))
 
 
 # register the handlers
